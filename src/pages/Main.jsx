@@ -1,22 +1,35 @@
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 const Main = () => {
+    const [textField, setTextField] = useState('Hello')
+    const navigate = useNavigate()
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        if (textField.trim() === "") return
+        navigate("/search?q=" + encodeURIComponent(textField.trim()))
+    }
     return (
         <section className="hero">
             <div className="hero-content">
-                <div className="eyebrow">OPEN LIBRARY</div>
+                <div className="eyebrow">OPEN ASS</div>
                 <h1>
                     Книги, которые
                     <br />
-                    хочется читать.
+                    <br />
+                    хочется какать.
                 </h1>
                 <p>
-                    Исследуйте миллионы книг, находите новые истории и
-                    открывайте авторов.
+                    Зарабатывай миллионы , на 1xbet.
                 </p>
-                <form className="search" id="searchForm">
+                <form onSubmit ={handleSubmit}
+                className="search" id="searchForm">
                     <span className="search-icon">⌕</span>
                     <input
                         id="searchInput"
                         type="text"
+                        value={textField}
+                        onChange={(e) => setTextField(e.target.value)}
                         placeholder="Название книги, автор или ISBN..."
                     />
                     <button type="submit">Найти</button>
