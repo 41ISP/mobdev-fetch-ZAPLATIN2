@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import BookCard from "../components/BookCard"
-
+import Loader from "../components/Loader"
 
 const Search = () => {
     const navigate = useNavigate()
@@ -17,11 +17,19 @@ const Search = () => {
     const loadBooks = async() => {
         try {
         setIsLoading(true)
-        const res = await fetch("https://openlibrary.org/search.json" + "?q=" + queryParam + "?&limit=20")
+        const res = await fetch("https://openlibrary.org/search.json" + 
+            "?q=" + 
+            queryParam + 
+            "?&limit=20", )
+        if (!res.ok) {
+            const data = await res.json()
+            throw new Error(data.detail[0].msg || "я хз, сделай сальто, может поможет")
+        }
         const data = await res.json()
-        setbooks(data.docs)          
+        setBooks(data.docs)          
         } catch (error) {
             console.error(error)
+            setError(error.message)
         } finally {
             setIsLoading(false)
         }
@@ -43,10 +51,10 @@ const Search = () => {
                 <form onSubmit={handleSubmit} className="search" id="searchForm">
                     <span className="search-icon">⌕</span>
                     <input
-                        value={textField}
-                        onChange={(e) => setTextField(e.target.value)}
                         id="searchInput"
                         type="text"
+                        value={textField}
+                        onChange={(e) => setTextField(e.target.value)}
                         placeholder="Название, автор или ISBN..."
                     />
                     <button type="submit">Найти</button>
@@ -64,9 +72,10 @@ const Search = () => {
             {isLoading && <Loader />}
             {books.length > 0 ? (
         <div className="book-grid" id="results">
-                {books.map((e) => (
-                    <BookCard {...e} />
-                ))}
+                {books.map((e) => {
+                const {key, ...props} = e
+                return <BookCard key={key} book_key={key} {...props} />
+                })}
                 </div>
                 ) :( 
                 !isLoading && <p>Книга не найдена</p>
